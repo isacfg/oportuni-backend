@@ -1,12 +1,43 @@
 # Deploying AdonisJS Application to Render
 
-This guide walks you through deploying your AdonisJS application to Render.
+This guide walks you through deploying your AdonisJS application to Render with a managed PostgreSQL database.
 
 ## Prerequisites
 
 1. A Render account
 2. Your code pushed to a Git repository (GitHub, GitLab, or Bitbucket)
 3. Google OAuth credentials configured
+4. **A managed PostgreSQL database** (recommended for production)
+
+## Database Setup (Recommended)
+
+### 1. Create a Managed PostgreSQL Database
+
+1. Go to your Render dashboard
+2. Click "New" → "PostgreSQL"
+3. Configure your database:
+   - **Name**: `oportuni-db`
+   - **Database**: `oportuni_db`
+   - **User**: `oportuni_db_user`
+   - **Region**: Choose same as your web service
+4. Click "Create Database"
+5. **Copy the External Database URL** from the database dashboard
+
+### 2. Database Configuration
+
+The application automatically detects the database type:
+- **Production (with DATABASE_URL)**: Uses PostgreSQL
+- **Development (no DATABASE_URL)**: Uses SQLite
+
+**Your Database URL Format:**
+```
+postgresql://username:password@host:port/database
+```
+
+**Example (your actual URL):**
+```
+postgresql://oportuni_db_user:Q71eRiVicNMszUZrI0jG62bHc6N4EvP3@dpg-d1q0hbbuibrs73e7tiag-a.oregon-postgres.render.com/oportuni_db
+```
 
 ## Environment Variables
 
@@ -23,13 +54,13 @@ Set these environment variables in your Render dashboard:
 | `APP_URL` | Your application URL | `https://your-app.onrender.com` |
 | `NODE_ENV` | Environment type | `production` |
 | `LOG_LEVEL` | Logging level | `info` |
+| `DATABASE_URL` | **PostgreSQL connection string** | **Your database URL from Step 1** |
 
 ### Optional Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `PORT` | Port to bind to | Set by Render (usually 10000) |
-| `DATABASE_URL` | Custom database file path | `/tmp/db.sqlite3` (auto-configured) |
 | `RUN_SEEDERS` | Run database seeders on deployment | `false` |
 
 ## Deployment Steps
@@ -50,7 +81,9 @@ Set these environment variables in your Render dashboard:
 
 In the "Environment" section of your service settings, add all the required environment variables listed above.
 
-⚠️ **Important**: Make sure to set `HOST=0.0.0.0` - this is required for Render to detect your application.
+⚠️ **Important**: 
+- Set `HOST=0.0.0.0` - required for Render to detect your application
+- Set `DATABASE_URL` to your PostgreSQL connection string
 
 ### 3. Update Google OAuth Settings
 
@@ -65,21 +98,11 @@ Since your callback URL is now dynamic, update your Google OAuth application:
 
 Click "Create Web Service" and Render will deploy your application.
 
-## Database Setup
-
-The application is configured to use SQLite with automatic database setup:
-
-### Automatic Configuration
-
-- **Development**: Uses app temp directory (`tmp/db.sqlite3`)
-- **Production**: Uses persistent directory (`/tmp/db.sqlite3`)
-- **Custom Path**: Override with `DATABASE_URL` environment variable
-
-### Database Tables
+## Database Migration
 
 The deployment script automatically:
-1. Creates the database file and directories
-2. Runs all migrations to create tables:
+1. Creates the database tables in PostgreSQL
+2. Runs all migrations:
    - `users`
    - `access_tokens`
    - `companies`
@@ -111,6 +134,13 @@ If you prefer separate commands:
 | `npm run migrate:production` | Run migrations only |
 | `npm run deploy` | Full deployment script |
 
+## Database Types
+
+| Environment | Database Type | Connection |
+|-------------|---------------|------------|
+| **Production** | PostgreSQL | Via `DATABASE_URL` |
+| **Development** | SQLite | Local file |
+
 ## Port Binding Fix
 
 The application has been configured to:
@@ -125,15 +155,16 @@ The application has been configured to:
 1. **Port binding errors**: Make sure `HOST=0.0.0.0` is set in environment variables
 2. **OAuth callback errors**: Ensure `APP_URL` is set and matches your Google OAuth settings
 3. **Build failures**: Check that all dependencies are in `package.json`
-4. **Database table errors**: Ensure migrations run successfully during deployment
-5. **Directory errors**: The deployment script automatically creates required directories
+4. **Database connection errors**: Verify `DATABASE_URL` is correctly set
+5. **Migration errors**: Check that the PostgreSQL database is accessible
 
 ### Database Issues
 
 If you encounter database-related errors:
 1. Check deployment logs for migration errors
-2. Verify `DATABASE_URL` is properly set (if using custom path)
-3. Ensure write permissions exist for the database directory
+2. Verify `DATABASE_URL` is properly set and accessible
+3. Ensure your PostgreSQL database is running
+4. Check that the database user has proper permissions
 
 ### Logs
 
@@ -152,6 +183,7 @@ APP_URL=http://localhost:3333
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 LOG_LEVEL=debug
+# DATABASE_URL=your-local-postgres-url (optional, will use SQLite if not set)
 ```
 
-This will use `localhost` for local development while `0.0.0.0` for production. 
+This will use SQLite for local development and PostgreSQL for production. 
