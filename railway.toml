@@ -2,6 +2,9 @@
 builder = "nixpacks"
 buildCommand = "npm ci && node ace build"
 
+# Configuração do Nixpacks para especificar versão do Node.js
+nixpacksPlan = { phases = { setup = { nixPkgs = ["nodejs_20", "python3", "gcc", "pkg-config"] } } }
+
 [deploy]
 # Comando executado antes do deploy (migrações de banco)
 preDeployCommand = ["node ace migration:run --force"]
@@ -13,7 +16,7 @@ startCommand = "cd build && node bin/server.js"
 healthcheckPath = "/"
 healthcheckTimeout = 300
 
-# Política de restart (on-failure, always, never)
+# Política de restart (ON_FAILURE, ALWAYS, NEVER)
 restartPolicyType = "ON_FAILURE"
 
 # Configurações de resources (opcional)
@@ -24,3 +27,6 @@ restartPolicyType = "ON_FAILURE"
 NODE_ENV = "production"
 PORT = "8080"
 LOG_LEVEL = "info"
+
+# Configuração para build do better-sqlite3
+PYTHON = "/usr/bin/python3"
