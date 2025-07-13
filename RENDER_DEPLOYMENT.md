@@ -29,6 +29,8 @@ Set these environment variables in your Render dashboard:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `PORT` | Port to bind to | Set by Render (usually 10000) |
+| `DATABASE_URL` | Custom database file path | `/tmp/db.sqlite3` (auto-configured) |
+| `RUN_SEEDERS` | Run database seeders on deployment | `false` |
 
 ## Deployment Steps
 
@@ -41,7 +43,7 @@ Set these environment variables in your Render dashboard:
 
    - **Name**: `oportuni-backend`
    - **Language**: `Node`
-   - **Build Command**: `npm install && npm run build`
+   - **Build Command**: `npm install && npm run deploy`
    - **Start Command**: `cd build && node bin/server.js`
 
 ### 2. Set Environment Variables
@@ -63,20 +65,58 @@ Since your callback URL is now dynamic, update your Google OAuth application:
 
 Click "Create Web Service" and Render will deploy your application.
 
+## Database Setup
+
+The application is configured to use SQLite with automatic database setup:
+
+### Automatic Configuration
+
+- **Development**: Uses app temp directory (`tmp/db.sqlite3`)
+- **Production**: Uses persistent directory (`/tmp/db.sqlite3`)
+- **Custom Path**: Override with `DATABASE_URL` environment variable
+
+### Database Tables
+
+The deployment script automatically:
+1. Creates the database file and directories
+2. Runs all migrations to create tables:
+   - `users`
+   - `access_tokens`
+   - `companies`
+   - `job_posts`
+   - `tags`
+   - `job_post_tags`
+   - `saved_jobs`
+
+### Seeders (Optional)
+
+To populate the database with sample data:
+1. Set `RUN_SEEDERS=true` in environment variables
+2. Redeploy your application
+
+## Deployment Script
+
+The `npm run deploy` command runs:
+1. `node ace build` - Build the application
+2. `node ace migration:run --force` - Run database migrations
+3. `node ace db:seed` - Run seeders (if `RUN_SEEDERS=true`)
+
+## Alternative Build Commands
+
+If you prefer separate commands:
+
+| Command | Description |
+|---------|-------------|
+| `npm run build:production` | Build + run migrations |
+| `npm run migrate:production` | Run migrations only |
+| `npm run deploy` | Full deployment script |
+
 ## Port Binding Fix
 
 The application has been configured to:
 - Use the `HOST` environment variable (set to `0.0.0.0` for Render)
 - Use the `PORT` environment variable (provided by Render)
 - Use dynamic callback URLs based on `APP_URL`
-
-## Database Setup
-
-If you need a database:
-
-1. Create a PostgreSQL database in Render
-2. Add the `DATABASE_URL` environment variable to your web service
-3. Update your `start/env.ts` to include database configuration
 
 ## Troubleshooting
 
@@ -85,6 +125,15 @@ If you need a database:
 1. **Port binding errors**: Make sure `HOST=0.0.0.0` is set in environment variables
 2. **OAuth callback errors**: Ensure `APP_URL` is set and matches your Google OAuth settings
 3. **Build failures**: Check that all dependencies are in `package.json`
+4. **Database table errors**: Ensure migrations run successfully during deployment
+5. **Directory errors**: The deployment script automatically creates required directories
+
+### Database Issues
+
+If you encounter database-related errors:
+1. Check deployment logs for migration errors
+2. Verify `DATABASE_URL` is properly set (if using custom path)
+3. Ensure write permissions exist for the database directory
 
 ### Logs
 

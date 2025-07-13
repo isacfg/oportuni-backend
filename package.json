@@ -7,6 +7,9 @@
   "scripts": {
     "start": "node bin/server.js",
     "build": "node ace build",
+    "build:production": "node ace build && npm run migrate:production",
+    "migrate:production": "node ace migration:run --force",
+    "deploy": "node scripts/deploy.js",
     "dev": "node ace serve --hmr",
     "test": "node ace test",
     "lint": "eslint .",
