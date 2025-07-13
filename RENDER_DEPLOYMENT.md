@@ -14,8 +14,9 @@ Set these environment variables in your Render dashboard:
 
 ### Required Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
+| Variable | Description | Value for Render |
+|----------|-------------|------------------|
+| `HOST` | Host to bind to | `0.0.0.0` |
 | `APP_KEY` | Your application encryption key | Generate with `node ace generate:key` |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID | `your-google-client-id` |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | `your-google-client-secret` |
@@ -27,7 +28,6 @@ Set these environment variables in your Render dashboard:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `HOST` | Host to bind to | `0.0.0.0` |
 | `PORT` | Port to bind to | Set by Render (usually 10000) |
 
 ## Deployment Steps
@@ -48,6 +48,8 @@ Set these environment variables in your Render dashboard:
 
 In the "Environment" section of your service settings, add all the required environment variables listed above.
 
+⚠️ **Important**: Make sure to set `HOST=0.0.0.0` - this is required for Render to detect your application.
+
 ### 3. Update Google OAuth Settings
 
 Since your callback URL is now dynamic, update your Google OAuth application:
@@ -64,7 +66,7 @@ Click "Create Web Service" and Render will deploy your application.
 ## Port Binding Fix
 
 The application has been configured to:
-- Bind to `0.0.0.0` by default (required by Render)
+- Use the `HOST` environment variable (set to `0.0.0.0` for Render)
 - Use the `PORT` environment variable (provided by Render)
 - Use dynamic callback URLs based on `APP_URL`
 
@@ -80,7 +82,7 @@ If you need a database:
 
 ### Common Issues
 
-1. **Port binding errors**: Make sure `HOST` defaults to `0.0.0.0`
+1. **Port binding errors**: Make sure `HOST=0.0.0.0` is set in environment variables
 2. **OAuth callback errors**: Ensure `APP_URL` is set and matches your Google OAuth settings
 3. **Build failures**: Check that all dependencies are in `package.json`
 
@@ -103,4 +105,4 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 LOG_LEVEL=debug
 ```
 
-This will override the default `HOST=0.0.0.0` for local development. 
+This will use `localhost` for local development while `0.0.0.0` for production. 
