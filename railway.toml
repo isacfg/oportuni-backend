@@ -1,6 +1,26 @@
 [build]
-builder = "dockerfile"
-dockerfilePath = "Dockerfile"
+builder = "nixpacks"
+buildCommand = "npm ci && node ace build"
 
 [deploy]
-startCommand = "nginx -g 'daemon off;'"   # default for nginx image
+# Comando executado antes do deploy (migrações de banco)
+preDeployCommand = ["node ace migration:run --force"]
+
+# Comando para iniciar a aplicação
+startCommand = "cd build && node bin/server.js"
+
+# Configuração de healthcheck
+healthcheckPath = "/"
+healthcheckTimeout = 300
+
+# Política de restart (on-failure, always, never)
+restartPolicyType = "on-failure"
+
+# Configurações de resources (opcional)
+# replicas = 1
+
+[variables]
+# Variáveis de ambiente específicas para produção
+NODE_ENV = "production"
+PORT = "8080"
+LOG_LEVEL = "info"
