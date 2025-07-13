@@ -1,0 +1,679 @@
+{
+  "info": {
+    "name": "Google OAuth API - AdonisJS",
+    "description": "Collection for testing Google OAuth authentication with AdonisJS backend",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3333",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "1. Start Google OAuth Flow",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/google/redirect",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "google", "redirect"]
+            },
+            "description": "Redirects to Google OAuth login page. Copy the redirect URL and open it in a browser to complete the OAuth flow."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Google OAuth Callback (Manual Test)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/google/callback?code=REPLACE_WITH_ACTUAL_CODE&state=REPLACE_WITH_ACTUAL_STATE",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "google", "callback"],
+              "query": [
+                {
+                  "key": "code",
+                  "value": "REPLACE_WITH_ACTUAL_CODE",
+                  "description": "Authorization code from Google"
+                },
+                {
+                  "key": "state",
+                  "value": "REPLACE_WITH_ACTUAL_STATE",
+                  "description": "State parameter from Google"
+                }
+              ]
+            },
+            "description": "This endpoint is called by Google after user authorization. You'll need to extract the code and state from the callback URL after completing the OAuth flow in a browser."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get Current User (Protected)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get current authenticated user information. Requires Bearer token."
+          },
+          "response": []
+        },
+        {
+          "name": "4. Logout (Protected)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Logout the current user. Requires Bearer token."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Companies",
+      "item": [
+        {
+          "name": "List Companies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/companies",
+              "host": ["{{baseUrl}}"],
+              "path": ["companies"]
+            },
+            "description": "Get all companies"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Company",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Example Company\",\n  \"description\": \"A great company to work for\",\n  \"logo_url\": \"https://example.com/logo.png\",\n  \"facebook_url\": \"https://facebook.com/example\",\n  \"linkedin_url\": \"https://linkedin.com/company/example\",\n  \"twitter_url\": \"https://twitter.com/example\",\n  \"instagram_url\": \"https://instagram.com/example\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/companies",
+              "host": ["{{baseUrl}}"],
+              "path": ["companies"]
+            },
+            "description": "Create a new company (requires authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Company",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/companies/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["companies", "1"]
+            },
+            "description": "Get specific company by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Company",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Company Name\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/companies/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["companies", "1"]
+            },
+            "description": "Update existing company"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Company",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/companies/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["companies", "1"]
+            },
+            "description": "Delete company (requires authentication and ownership)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Job Posts",
+      "item": [
+        {
+          "name": "List Job Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/job-posts?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["job-posts"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get all job posts with pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Job Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Frontend Developer\",\n  \"description\": \"We are looking for a senior frontend developer to join our team...\",\n  \"company_id\": 1,\n  \"contract_type\": \"CLT\",\n  \"location\": \"São Paulo, SP\",\n  \"remote\": true,\n  \"application_url\": \"https://example.com/apply\",\n  \"simplified_application\": false,\n  \"reduced_hours\": false,\n  \"external_url\": \"https://example.com/job-details\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/job-posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["job-posts"]
+            },
+            "description": "Create a new job post"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Job Post",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/job-posts/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["job-posts", "1"]
+            },
+            "description": "Get specific job post by ID with company and tags"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Job Post",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Job Title\",\n  \"description\": \"Updated job description\",\n  \"remote\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/job-posts/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["job-posts", "1"]
+            },
+            "description": "Update existing job post"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Job Post",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/job-posts/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["job-posts", "1"]
+            },
+            "description": "Delete job post"
+          },
+          "response": []
+        },
+        {
+          "name": "Attach Tags to Job Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tag_ids\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/job-posts/1/tags/attach",
+              "host": ["{{baseUrl}}"],
+              "path": ["job-posts", "1", "tags", "attach"]
+            },
+            "description": "Attach tags to a job post"
+          },
+          "response": []
+        },
+        {
+          "name": "Detach Tags from Job Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tag_ids\": [1, 2]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/job-posts/1/tags/detach",
+              "host": ["{{baseUrl}}"],
+              "path": ["job-posts", "1", "tags", "detach"]
+            },
+            "description": "Remove tags from a job post"
+          },
+          "response": []
+        },
+        {
+          "name": "Sync Tags with Job Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tag_ids\": [1, 3, 5]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/job-posts/1/tags/sync",
+              "host": ["{{baseUrl}}"],
+              "path": ["job-posts", "1", "tags", "sync"]
+            },
+            "description": "Replace all tags on a job post"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tags",
+      "item": [
+        {
+          "name": "List Tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags"]
+            },
+            "description": "Get all tags"
+          },
+          "response": []
+        },
+        {
+          "name": "List Tags by Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tags?type=skill",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "skill",
+                  "description": "Filter by tag type: skill, benefit, language, framework, contract, location"
+                }
+              ]
+            },
+            "description": "Get tags filtered by type"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Tag",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"JavaScript\",\n  \"type\": \"skill\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags"]
+            },
+            "description": "Create a new tag. Types: skill, benefit, language, framework, contract, location"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tag",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tags/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags", "1"]
+            },
+            "description": "Get specific tag by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Tag",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"TypeScript\",\n  \"type\": \"skill\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tags/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags", "1"]
+            },
+            "description": "Update existing tag"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Tag",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tags/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["tags", "1"]
+            },
+            "description": "Delete tag"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Saved Jobs",
+      "item": [
+        {
+          "name": "List Saved Jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/saved-jobs?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["saved-jobs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get user's saved jobs with pagination (requires authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"job_post_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/saved-jobs",
+              "host": ["{{baseUrl}}"],
+              "path": ["saved-jobs"]
+            },
+            "description": "Save a job post (requires authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Saved Job by ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/saved-jobs/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["saved-jobs", "1"]
+            },
+            "description": "Remove saved job by saved job ID (requires authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Saved Job by Job Post ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/saved-jobs/job-post/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["saved-jobs", "job-post", "1"]
+            },
+            "description": "Remove saved job by job post ID (requires authentication)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Test Endpoints",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Basic health check endpoint to verify server is running."
+          },
+          "response": []
+        },
+        {
+          "name": "Test Protected Route (Should Fail)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Test protected route without authentication - should return 401."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ]
+}
