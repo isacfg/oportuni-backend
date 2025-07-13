@@ -14,7 +14,7 @@ healthcheckPath = "/"
 healthcheckTimeout = 300
 
 # Política de restart (on-failure, always, never)
-restartPolicyType = "on-failure"
+restartPolicyType = "ON_FAILURE"
 
 # Configurações de resources (opcional)
 # replicas = 1
