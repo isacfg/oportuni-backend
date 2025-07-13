@@ -21,6 +21,13 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   /*
   |----------------------------------------------------------
+  | Variables for configuring database
+  |----------------------------------------------------------
+  */
+  DATABASE_URL: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------
   | Variables for configuring ally package
   |----------------------------------------------------------
   */
