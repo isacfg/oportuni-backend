@@ -9,9 +9,9 @@ export const jobPostValidator = vine.compile(
     contract_type: vine.enum(CONTRACT_TYPE_VALUES),
     location: vine.string().trim().minLength(2).maxLength(100),
     remote: vine.boolean().optional(),
-    application_url: vine.string().url().optional(),
+    // application_url: vine.string().url().optional(),
     simplified_application: vine.boolean().optional(),
     reduced_hours: vine.boolean().optional(),
-    external_url: vine.string().url().optional(),
+    // external_url: vine.string().url().optional(),
   })
 )

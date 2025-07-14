@@ -45,13 +45,14 @@ export default class JobPostsController {
       .orderBy('job_posts.created_at', 'desc')
 
     if (auth.user) {
+      console.log('USERRRR')
       query.select([
         db.raw(
           `CASE WHEN EXISTS (
-            SELECT 1 FROM saved_jobs
-            WHERE saved_jobs.job_post_id = job_posts.id
-            AND saved_jobs.user_id = ?
-          ) THEN 1 ELSE 0 END as is_saved`,
+          SELECT 1 FROM saved_jobs
+          WHERE saved_jobs.job_post_id = job_posts.id
+          AND saved_jobs.user_id = ?
+        ) THEN 1 ELSE 0 END as is_saved`,
           [auth.user.id]
         ),
       ])
@@ -109,7 +110,8 @@ export default class JobPostsController {
       externalUrl: job.external_url,
       createdAt: job.created_at,
       updatedAt: job.updated_at,
-      isSaved: Boolean(job.is_saved),
+      // Fix: Convert the database result to boolean properly
+      isSaved: Boolean(Number(job.is_saved)),
       company: {
         id: job.company_id,
         name: job.company_name,
@@ -125,6 +127,15 @@ export default class JobPostsController {
       },
       tags: tagsByJobPost[job.id] || [],
     }))
+
+    // Debug: Log a sample job to check is_saved value
+    if (transformedData.length > 0) {
+      console.log('Sample job is_saved value:', {
+        raw: transformedData[0].isSaved,
+        jobId: transformedData[0].id,
+        userId: auth.user?.id
+      })
+    }
 
     // retornar a estrutura de paginação com os dados transformados
     return {
